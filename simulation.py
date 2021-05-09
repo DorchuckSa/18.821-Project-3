@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-ALPHA = 0.0000001 ## init 10^-10, next 10^-09
+ALPHA =  10**(-9) ## init 10^-10, next 10^-09
 
 
 def make_init_polynomial(deg):
@@ -29,8 +29,10 @@ def random_perturb_poly(init_poly, alpha):
 
     return scared_poly
 
-def compute_prob_complex_roots(rounds = 1000, deg=10, alpha = ALPHA):
+def compute_prob_complex_roots(rounds = 10000, deg=10, alpha = ALPHA):
+    print("alpha is", alpha)
     init_poly = make_init_polynomial(deg)
+    count = 0
 
     for i in range(rounds):
         fearful_poly = random_perturb_poly(init_poly, alpha)
@@ -40,10 +42,15 @@ def compute_prob_complex_roots(rounds = 1000, deg=10, alpha = ALPHA):
         complex_roots = roots[np.iscomplex(roots)]
 
         if len(complex_roots) > 0:
-            print("WE HAVE SOME COMPLEX ROOTS")
-            print("All roots", roots)
-            print("Complex roots", complex_roots)
-            print("Real roots", real_roots)
+            # print("WE HAVE SOME COMPLEX ROOTS")
+            # print("All roots", roots)
+            # print("Complex roots", complex_roots)
+            # print("Real roots", real_roots)
+            count += 1
+        
+    emp_prob = count/rounds
+    print("PROB COMPLEX", emp_prob)
+    return emp_prob
         
 
 
@@ -83,16 +90,49 @@ def simul(deg=10, rounds=10000, plot = False, alpha = ALPHA):
 
             plt.xlabel(f"Value of Root r{i+1}")
             plt.ylabel("Frequency")
-            plt.title(f"Monte Carlo Simulation Values for Root r{i+1} \n Init Root = {og_root:.3f}, mu = {mu:.3f}, sigma = {sigma:.3f}")
+            plt.title(f"Monte Carlo Simulation Values for Root r{i+1} \n Init Root = {og_root:.3f}, mu = {mu:.3f}, sigma = {sigma:.6f}")
 
         plt.show()
 
+def plot_complexity_rates_by_alpha_deg_2(deg = 2):
+    complexity_rates = []
+    alphas = []
+    for i in range(201):
+        val_alpha = i/100.0
+        alphas.append(val_alpha)
+        temp = compute_prob_complex_roots(deg = deg, alpha = val_alpha)
+        complexity_rates.append(temp)
+    
+    plt.plot(alphas, complexity_rates)
+    plt.xlabel("Value of Alpha")
+    plt.ylabel("Probability of Petrubing to a Complex Root")
+    plt.title("Probability of Introducing a Complex Root for Deg=2 Polynomial based on Value of Alpha")
+    plt.show()
+
+def plot_complexity_rates_by_alpha_deg_10(deg = 10):
+    complexity_rates = []
+    alphas = []
+    for i in range(201):
+        val_alpha = i/5.0 * 10**(-8)
+        alphas.append(val_alpha)
+        temp = compute_prob_complex_roots(deg = deg, alpha = val_alpha)
+        complexity_rates.append(temp)
+    
+    plt.plot(alphas, complexity_rates)
+    plt.xlabel("Value of Alpha")
+    plt.ylabel("Probability of Petrubing to a Complex Root")
+    plt.title("Probability of Introducing a Complex Root for \n Deg=10 Polynomial based on Value of Alpha")
+    plt.show()
+
+
 
 def main():
-    # a = make_init_polynomial(10)
-    # print(a)
-    simul(deg=2, plot=True, alpha = 0.01)
-    # compute_prob_complex_roots(deg = 2, alpha = 0.01)
+    a = make_init_polynomial(10)
+    print(a)
+    # simul(deg=2, plot=True, alpha = ALPHA)
+    # compute_prob_complex_roots(deg = 10, alpha = 1*10**(-1))
+    # plot_complexity_rates_by_alpha(deg=2)
+    # plot_complexity_rates_by_alpha_deg_10()
 
 
 if __name__ == "__main__":
