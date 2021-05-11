@@ -1,5 +1,7 @@
 import numpy as np
+from scipy import special
 import matplotlib.pyplot as plt
+import math
 
 ALPHA =  10**(-9) ## init 10^-10, next 10^-09
 
@@ -19,13 +21,18 @@ def make_init_polynomial(deg):
 
 def random_perturb_poly(init_poly, alpha):
     coeffs = np.asarray(init_poly)
+    # print("coeffs are", coeffs)
     new_coeffs = []
     
-    for coeff in coeffs:
+    for i, coeff in enumerate(coeffs):
+        if i == 0:
+            new_coeffs.append(coeff)
+            continue
         new_coeff = coeff * (1 + alpha * np.random.normal()) ## draws from normal dist with mu=0 and sd=1.0=var
         new_coeffs.append(new_coeff)
     
     scared_poly = np.poly1d(new_coeffs)
+    # print("new coeffs are", new_coeffs)
 
     return scared_poly
 
@@ -90,7 +97,7 @@ def simul(deg=10, rounds=10000, plot = False, alpha = ALPHA):
 
             plt.xlabel(f"Value of Root r{i+1}")
             plt.ylabel("Frequency")
-            plt.title(f"Monte Carlo Simulation Values for Root r{i+1} \n Init Root = {og_root:.3f}, mu = {mu:.3f}, sigma = {sigma:.6f}")
+            plt.title(f"Monte Carlo Simulation Values for Root r{11-(i+1)} \n Init Root = {og_root:.3f}, mu = {mu:.3f}, sigma = {sigma:.6f}")
 
         plt.show()
 
@@ -124,15 +131,35 @@ def plot_complexity_rates_by_alpha_deg_10(deg = 10):
     plt.title("Probability of Introducing a Complex Root for \n Deg=10 Polynomial based on Value of Alpha")
     plt.show()
 
+def plot_jeff_funct_1():
+    x = np.linspace(0.000000000000001, 8.72*10**(-4))
+    func = special.erf((6.72*10**(-4)/(x * math.sqrt(2))))**10
+    plt.plot(x, func) 
+    plt.title("Lower Bound on Probability of at Least One \n Real Root as a Function of a")
+    plt.xlabel("Value of a")
+    plt.ylabel("Lower Bound on Probability of no Complex Roots")
+    plt.show()
+
+def plot_jeff_funct_2():
+    x = np.linspace(0.000000000000001, 2.72*10**(-8))
+    func = special.erf((1.82*10**(-8)/(x * math.sqrt(2))))**10
+    plt.plot(x, func) 
+    plt.title("Lower Bound on Probability of at Least One \n Real Root as a Function of a")
+    plt.xlabel("Value of a")
+    plt.ylabel("Lower Bound on Probability of no Complex Roots")
+    plt.show()
+
 
 
 def main():
     a = make_init_polynomial(10)
     print(a)
-    # simul(deg=2, plot=True, alpha = ALPHA)
+    # random_perturb_poly(a, alpha=ALPHA)
+    # simul(deg=10, plot=True, alpha = ALPHA)
     # compute_prob_complex_roots(deg = 10, alpha = 1*10**(-1))
     # plot_complexity_rates_by_alpha(deg=2)
     # plot_complexity_rates_by_alpha_deg_10()
+    plot_jeff_funct_2()
 
 
 if __name__ == "__main__":
